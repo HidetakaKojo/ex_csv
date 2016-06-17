@@ -62,6 +62,13 @@ defmodule ExCsv.ParserTest do
     assert ExCsv.Parser.parse(~s<a,b,c\r\nd,e,f>) |> body == [["a", "b", "c"], ["d", "e", "f"]]
   end
 
+  test "one simple line with a quoted delimiter" do
+    assert ExCsv.Parser.parse(~s<a,ba",t ,c>) |> body == [["a", "ba,t", "c"]]
+  end
+  test "one simple line with a quoted delimiter with backslash" do
+    assert ExCsv.Parser.parse(~s<a,ba\\,t ,c>, quote: [92]) |> body == [["a", "ba,t", "c"]]
+  end
+
   defp body({:ok, %{body: body}}), do: body
 
 end
