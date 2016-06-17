@@ -64,7 +64,7 @@ defmodule ExCsv.Parser do
   defp build(<<char>> <> rest, [["" | _previous_fields] | _previous_rows] = rows, %{quote: char, quoting: false} = config) do
     rest |> build(rows, %{ config | quoting: true, eat_next_quote: true })
   end
-  # Escape a delimiter in the middle of a field (retain this quote pair)
+  # Escape a delimiter in the middle of a field
   defp build(<<char>> <> <<char_d>> <> rest,  [[current_field | previous_fields] | previous_rows], %{quote: char, delimiter: char_d, quoting: false} = config) do
     current_row = [current_field <> <<char_d::utf8>> | previous_fields]
     rows = [current_row | previous_rows]
