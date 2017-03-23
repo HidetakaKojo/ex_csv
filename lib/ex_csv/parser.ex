@@ -50,13 +50,13 @@ defmodule ExCsv.Parser do
   defp build(<<char>> <> rest, [[] | previous_rows], %{delimiter: char, quoting: false} = config) do
     current_row = [new_field, new_field]
     rows = [current_row | previous_rows]
-    rest |> skip_whitespace |> build(rows, config)
+    rest |> build(rows, config)
   end
   # After the beginning of a row
   defp build(<<char>> <> rest, [[current_field | previous_fields] | previous_rows], %{delimiter: char, quoting: false} = config) do
-    current_row = [new_field | [current_field |> String.rstrip | previous_fields]]
+    current_row = [new_field | [current_field | previous_fields]]
     rows = [current_row | previous_rows]
-    rest |> skip_whitespace |> build(rows, config)
+    rest |> build(rows, config)
   end
 
   # QUOTE
@@ -78,7 +78,7 @@ defmodule ExCsv.Parser do
   end
   # End quote and don't retain the quote character (full-field quoting)
   defp build(<<char>> <> rest, rows, %{quote: char, quoting: true, eat_next_quote: true} = config) do
-    rest |> skip_whitespace |> build(rows, %{ config | quoting: false })
+    rest |> build(rows, %{ config | quoting: false })
   end
   # End quote and retain the quote character (partial field quoting)
   defp build(<<char>> <> rest, [[current_field | previous_fields] | previous_rows], %{quote: char, quoting: true, eat_next_quote: false} = config) do
@@ -118,16 +118,11 @@ defmodule ExCsv.Parser do
   defp build_newline(rest, current_field, previous_fields, previous_rows, config) do
     current_row = [current_field |> String.rstrip | previous_fields]
     rows = [new_row | [current_row | previous_rows]]
-    rest |> skip_whitespace |> build(rows, config)
+    rest |> build(rows, config)
   end
 
   defp rstrip([[""] | rows]), do: rows
   defp rstrip(rows), do: rows
-
-  defp skip_whitespace(<<char>> <> rest) when char in '\s\r' do
-    skip_whitespace(rest)
-  end
-  defp skip_whitespace(string), do: string
 
   defp skip_dotall(<<char>> <> rest) when char in '\s\r\n\t' do
     skip_dotall(rest)
